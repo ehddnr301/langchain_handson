@@ -29,6 +29,27 @@ with st.form(key="my-form"):
     )
     submit = st.form_submit_button("제출")
 
+
+def chatbot_good(sentence, food_type):
+    params = {
+        "is_good": 1,
+        "sentence": sentence,
+        "recommended_foodtype": food_type,
+    }
+    requests.get("http://127.0.0.1:8881/satisfy/", params=params)
+    st.toast("Chatbot Good 의견이 접수되었습니다.")
+
+
+def chatbot_not_good(sentence, food_type):
+    params = {
+        "is_good": 0,
+        "sentence": sentence,
+        "recommended_foodtype": food_type,
+    }
+    requests.get("http://127.0.0.1:8881/satisfy/", params=params)
+    st.toast("Chatbot Not Good 의견이 접수되었습니다.")
+
+
 if submit:
     res = requests.get("http://127.0.0.1:8881/sentences/" + sentence)
 
@@ -50,9 +71,14 @@ if submit:
             else:
                 st.write(f"{food}에 해당하는 음식은 {food_list} 입니다.")
 
-        else:
-            st.error("제가 문장을 잘 이해하지 못했을 수 있어요. 상담원 연결해드릴까요?")
+            if food:
+                button = st.button(
+                    "답변에 만족", on_click=chatbot_good, args=(sentence, food)
+                )
+                button = st.button(
+                    "답변에 불만족", on_click=chatbot_not_good, args=(sentence, food)
+                )
 
     else:
-        st.error("Chatbot 서버에 접속할 수 없습니다. 서버를 확인해주세요.")
+        st.error("제가 문장을 잘 이해하지 못했을 수 있어요. 상담원 연결해드릴까요?")
         st.stop()
