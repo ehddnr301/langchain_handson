@@ -36,7 +36,22 @@ if submit:
         food = res.text
         food = food.replace('"', "")
 
-        st.write(f"답변이에요: {res.text}")
+        res = requests.get("http://127.0.0.1:8881/foods/" + food)
+
+        if res.status_code == 200:
+            food_list = json.loads(res.text)
+
+            st.write(f"당신이 입력한 문장은 '{sentence}' 입니다.")
+            st.write(f"당신이 입력한 문장은 '{food}'에 해당합니다.")
+            if food == "분류불가":
+                st.write(
+                    "제가 문장을 잘 이해하지 못했을 수 있어요. 상담원 연결해드릴까요?"
+                )
+            else:
+                st.write(f"{food}에 해당하는 음식은 {food_list} 입니다.")
+
+        else:
+            st.error("제가 문장을 잘 이해하지 못했을 수 있어요. 상담원 연결해드릴까요?")
 
     else:
         st.error("Chatbot 서버에 접속할 수 없습니다. 서버를 확인해주세요.")
